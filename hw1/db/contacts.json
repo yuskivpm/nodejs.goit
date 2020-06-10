@@ -42,12 +42,6 @@
     "phone": "(715) 598-5792"
   },
   {
-    "id": 8,
-    "name": "Simon Morton",
-    "email": "dui.Fusce.diam@Donec.com",
-    "phone": "(233) 738-2360"
-  },
-  {
     "id": 10,
     "name": "Alec Howard",
     "email": "Donec.elementum@scelerisquescelerisquedui.net",
@@ -55,6 +49,12 @@
   },
   {
     "id": 11,
+    "name": "Mango1",
+    "email": "mango@gmail.com",
+    "phone": "322-22-22"
+  },
+  {
+    "id": 12,
     "name": "Mango1",
     "email": "mango@gmail.com",
     "phone": "322-22-22"

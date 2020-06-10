@@ -4,7 +4,7 @@ const { listContacts, getContactById, addContact, removeContact } = require('./c
 function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case 'list':
-      listContacts(contacts => console.log(contacts));
+      listContacts(contacts => console.table(contacts));
       break;
 
     case 'get':
