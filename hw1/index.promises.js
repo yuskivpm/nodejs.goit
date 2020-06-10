@@ -23,7 +23,7 @@ function invokeAction({ action, id, name, email, phone }) {
     default:
       logThis = Promise.reject('\x1B[31m Unknown action type!');
   }
-  logThis.then(data => console.log(data || '')).catch(err => console.warn(err));
+  logThis.then(data => console.table(data || '')).catch(err => console.warn(err));
 }
 
 invokeAction(argv);
