@@ -2,32 +2,20 @@ const argv = require('yargs').argv;
 
 const { listContacts, getContactById, addContact, removeContact, updateContact } = require('./contacts');
 
+const handlers = {
+  list: listContacts,
+  get: ({ id }) => getContactById(id),
+  add: ({ name, email, phone }) => addContact(name, email, phone),
+  remove: ({ id }) => removeContact(id).then(() => 'Item removed'),
+  update: ({ id, contact }) => updateContact(id, JSON.parse(contact)),
+};
+
+const invokeAction = ({ action, ...args }) =>
+  handlers[action]
+    ? handlers[action](args).then(data => console.table(data || '')).catch(err => console.warn(err))
+    : startServer();
+
 invokeAction(argv);
-
-function invokeAction({ action, id, name, email, phone }) {
-  let logThis;
-  switch (action) {
-    case 'list':
-      logThis = listContacts();
-      break;
-
-    case 'get':
-      logThis = getContactById(id);
-      break;
-
-    case 'add':
-      logThis = addContact(name, email, phone);
-      break;
-
-    case 'remove':
-      logThis = removeContact(id).then(() => 'Item removed');
-      break;
-
-    default:
-      return startServer();
-  }
-  logThis.then(data => console.table(data || '')).catch(err => console.warn(err));
-}
 
 function startServer() {
   const PORT = 3000;
@@ -44,7 +32,7 @@ function startServer() {
   const response_any = (response, message, code = 200) => response.status(code).send(message);
   const response_404 = response => response_any(response, MSG_NOT_FOUND, 404);
   const response_500 = (error, response) => response_any(response, { error }, 500);
-  const catchExeption = (response, promise) => promise.catch(err => response_500(err, response));
+  const catchException = (response, promise) => promise.catch(err => response_500(err, response));
 
   function validateBody({ body = {} } = {}) {
     const error = [];
@@ -56,14 +44,18 @@ function startServer() {
   const express = require('express');
   const app = express();
 
-  app.use(express.json(), require('cors')(), require('morgan')('combined'));
+  app.use(
+    express.json(),
+    require('cors')(),
+    require('morgan')('combined')
+  );
 
   /* @ GET /api/contacts
   Call listContacts().
   Returns the code 200 and JSON with an array of all contacts.
   */
   app.get(API_CONTACTS, (request, response) =>
-    catchExeption(
+    catchException(
       response,
       listContacts().then(contacts => response_any(response, contacts))
     )
@@ -76,7 +68,7 @@ function startServer() {
   Else it returns the code 404 and JSON {"message": "Not found"}
   */
   app.get(API_CONTACT_BY_ID, (request, response) =>
-    catchExeption(
+    catchException(
       response,
       getContactById(request.params[CONTACT_ID]).then(contact =>
         contact ? response_any(response, contact) : response_404(response)
@@ -94,7 +86,7 @@ function startServer() {
     if (error.length) {
       return response_any(response, { message: `missing required ${error} field${error.length > 1 ? 's' : ''}` }, 400);
     }
-    catchExeption(
+    catchException(
       response,
       addContact(...fields).then(newContact => response_any(response, newContact, 201))
     );
@@ -107,7 +99,7 @@ function startServer() {
   Else it returns the code 404 and JSON {"message": "Not found"}
   */
   app.delete(API_CONTACT_BY_ID, (request, response) =>
-    catchExeption(
+    catchException(
       response,
       removeContact(request.params[CONTACT_ID]).then(result =>
         result ? response_any(response, MSG_CONTACT_DELETED) : response_404(response)
@@ -126,7 +118,7 @@ function startServer() {
     if (error.length === FIELD_NAMES.length) {
       return response_any(response, MSG_MISSING_FIELDS, 400);
     }
-    catchExeption(
+    catchException(
       response,
       updateContact(request.params[CONTACT_ID], contact).then(updatedContact =>
         updatedContact ? response_any(response, updatedContact) : response_404(response)
