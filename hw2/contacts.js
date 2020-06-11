@@ -7,12 +7,14 @@ const contactPath = path.join(__dirname, 'db', 'contacts.json');
 const getMaxId = contacts => contacts.reduce((maxId, { id }) => Math.max(maxId, id), 0) + 1;
 const prepareData = contacts => JSON.stringify(contacts, null, 2);
 const getIndexById = (contacts, contactId) => contacts.findIndex(({ id }) => id == contactId);
-const listContacts = () => fs.promises.readFile(contactPath, 'utf8').then(data => JSON.parse(data));
 
 // get all contacts
-const getContactById = contactId => listContacts().then(contacts => contacts.find(({ id }) => id == contactId));
+const listContacts = () => fs.promises.readFile(contactPath, 'utf8').then(data => JSON.parse(data));
 
 // get contact by id
+const getContactById = contactId => listContacts().then(contacts => contacts.find(({ id }) => id == contactId));
+
+// delete contact by id
 async function removeContact(contactId) {
   const contacts = await listContacts();
   const contactIndex = getIndexById(contacts, contactId);
