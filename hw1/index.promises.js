@@ -8,8 +8,9 @@ const handlers = {
   remove: ({ id }) => removeContact(id).then(() => 'Item removed'),
 };
 
-const invokeAction = ({ action, ...args }) =>
-  (handlers[action] ? handlers[action](args) : Promise.reject('\x1B[31m Unknown action type!'))
-    .then(data => console.table(data || '')).catch(err => console.warn(err));
+const invokeAction = ({ action, ...contactData }) =>
+  (handlers.hasOwnProperty(action) ? handlers[action](contactData) : Promise.reject('\x1B[31m Unknown action type!'))
+    .then((data = '') => console.table(data))
+    .catch(err => console.warn(err));
 
 invokeAction(argv);

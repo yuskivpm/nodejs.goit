@@ -7,12 +7,14 @@ const handlers = {
   get: ({ id }) => getContactById(id),
   add: ({ name, email, phone }) => addContact(name, email, phone),
   remove: ({ id }) => removeContact(id).then(() => 'Item removed'),
-  update: ({ id, contact }) => updateContact(id, JSON.parse(contact)),
+  update: ({ id, contact = '{}' }) => updateContact(id, JSON.parse(contact)),
 };
 
-const invokeAction = ({ action, ...args }) =>
-  handlers[action]
-    ? handlers[action](args).then(data => console.table(data || '')).catch(err => console.warn(err))
+const invokeAction = ({ action, ...contactData }) =>
+  handlers.hasOwnProperty(action)
+    ? handlers[action](contactData)
+        .then((data = '') => console.table(data))
+        .catch(err => console.warn(err))
     : startServer();
 
 invokeAction(argv);
@@ -44,11 +46,7 @@ function startServer() {
   const express = require('express');
   const app = express();
 
-  app.use(
-    express.json(),
-    require('cors')(),
-    require('morgan')('combined')
-  );
+  app.use(express.json(), require('cors')(), require('morgan')('combined'));
 
   /* @ GET /api/contacts
   Call listContacts().

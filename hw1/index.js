@@ -8,7 +8,7 @@ const handlers = {
   remove: ({ id }) => removeContact(id, () => console.log('Item removed')),
 };
 
-const invokeAction = ({ action, ...args }) =>
-  handlers[action] ? handlers[action](args) : console.warn('\x1B[31m Unknown action type!');
+const invokeAction = ({ action, ...contactData }) =>
+  handlers.hasOwnProperty(action) ? handlers[action](contactData) : console.warn('\x1B[31m Unknown action type!');
 
 invokeAction(argv);
